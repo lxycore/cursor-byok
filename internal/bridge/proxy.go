@@ -5,6 +5,7 @@ import (
 	"cursor/internal/certs"
 	"cursor/internal/client"
 	"cursor/internal/mitm"
+	"cursor/internal/workspace"
 	"runtime"
 )
 
@@ -168,6 +169,14 @@ func (s *ProxyService) ClearCursorSettings() error {
 // ShutdownForQuit 用于处理与 ShutdownForQuit 相关的逻辑。
 func (s *ProxyService) ShutdownForQuit() {
 	s.core.ShutdownForQuit()
+}
+
+// WorkspaceManager 返回 workspace 版本系统管理器（可能为 nil）。
+func (s *ProxyService) WorkspaceManager() *workspace.Manager {
+	if s == nil || s.core == nil {
+		return nil
+	}
+	return s.core.WorkspaceManager()
 }
 
 // IsWindows 用于处理与 IsWindows 相关的逻辑。

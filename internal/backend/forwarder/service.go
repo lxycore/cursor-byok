@@ -27,6 +27,7 @@ import (
 	modeladapter "cursor/internal/backend/agent/model"
 	promptengine "cursor/internal/backend/agent/prompt"
 	protocol "cursor/internal/backend/agent/protocol"
+	"cursor/internal/workspace"
 )
 
 const (
@@ -264,6 +265,7 @@ type Service struct {
 	execBridge         execbridge.ExecBridge
 	interactionBridge  interactionbridge.InteractionBridge
 	appendSeq          *appendSequenceTracker
+	ws                 *workspace.Manager
 }
 
 type agentModelMemory interface {
@@ -273,6 +275,20 @@ type agentModelMemory interface {
 
 // NewService 使用默认依赖创建 forwarder 服务。
 func NewService(historyRoot string, resolver modeladapter.ChannelResolver) *Service {
+	return NewServiceWithWorkspace(historyRoot, resolver, nil)
+}
+
+// Workspace 返回 workspace 版本系统管理器（可能为 nil，测试场景）。
+func (service *Service) Workspace() *workspace.Manager {
+	if service == nil {
+		return nil
+	}
+	return service.ws
+}
+
+// NewServiceWithWorkspace 使用默认依赖创建 forwarder 服务，并允许注入
+// 进程级 workspace 管理器（跨 rebuild 复用，保证记录端与查询端一致）。
+func NewServiceWithWorkspace(historyRoot string, resolver modeladapter.ChannelResolver, ws *workspace.Manager) *Service {
 	projector := NewHistoryProjector()
 	store := NewConversationFileStore(historyRoot)
 	contentBlobs := NewContentBlobStore(historyRoot)
@@ -287,6 +303,11 @@ func NewService(historyRoot string, resolver modeladapter.ChannelResolver) *Serv
 		debugConfig = candidate
 	}
 	debug := newDebugRecorder(historyRoot, broker, debugConfig)
+	if ws == nil {
+		wsRoot := appdata.WorkspaceRootPath()
+		ws = workspace.NewManager(wsRoot)
+		_ = ws.EnsureRoot()
+	}
 	service := &Service{
 		store:              store,
 		contentBlobs:       contentBlobs,
@@ -305,6 +326,7 @@ func NewService(historyRoot string, resolver modeladapter.ChannelResolver) *Serv
 		execBridge:         execbridge.NewBridge(),
 		interactionBridge:  interactionbridge.NewBridge(),
 		appendSeq:          newAppendSequenceTracker(),
+		ws:                 ws,
 	}
 	service.startHistoryMaintenance()
 	store.SyncAllCursorTranscriptsBestEffort()
@@ -686,9 +708,122 @@ func (service *Service) decodeInboundIntent(requestID string, message *agentv1.A
 	return intent, nil
 }
 
+// coordinateAIWrite 在 AI 写盘前做并发协调（三方合并/冲突处理）。
+// 返回最终应写入的内容（合并结果或 AI 原始意图）。
+func (service *Service) coordinateAIWrite(stream *ActiveStream, path string, beforeContent string, afterContent string) string {
+	if service == nil || service.ws == nil || stream == nil {
+		return afterContent
+	}
+	conversationID := strings.TrimSpace(stream.ConversationID)
+	project := service.ws.ProjectForConversation(conversationID)
+	if project == nil {
+		return afterContent
+	}
+	path = workspace.NormalizePath(path)
+	if path == "" {
+		return afterContent
+	}
+	owner := &workspace.WriterRef{
+		ConversationID: conversationID,
+		TurnSeq:        stream.TurnSeq,
+		RequestID:      strings.TrimSpace(stream.RequestID),
+		Source:         string(workspace.SourceAI),
+	}
+	plan := project.Coordinator.PlanAIWritePath(path, beforeContent, afterContent, owner)
+	if plan.Result.Outcome == workspace.OutcomeConflict {
+		log.Printf(
+			"forwarder coordinated write conflict conversation=%s path=%s type=%s overlap=%s",
+			conversationID,
+			path,
+			plan.Result.Conflict.ConflictType,
+			plan.Result.Conflict.OverlapRange,
+		)
+	} else if plan.Result.Outcome == workspace.OutcomeFileGone {
+		log.Printf(
+			"forwarder coordinated write file gone conversation=%s path=%s",
+			conversationID,
+			path,
+		)
+	} else if plan.Result.Merged {
+		log.Printf(
+			"forwarder coordinated write merged conversation=%s path=%s",
+			conversationID,
+			path,
+		)
+	}
+	return plan.Content
+}
+
+// bindConversationProject 把对话绑定到 request_context 中的项目根，
+// 供 workspace 版本系统按项目组织编辑事件。
+func (service *Service) bindConversationProject(intent InboundIntent) {
+	if service == nil || service.ws == nil || strings.TrimSpace(intent.ConversationID) == "" {
+		return
+	}
+	if intent.RequestContext == nil || intent.RequestContext.GetEnv() == nil {
+		return
+	}
+	for _, path := range intent.RequestContext.GetEnv().GetWorkspacePaths() {
+		path = strings.TrimSpace(path)
+		if path != "" {
+			service.ws.BindConversation(intent.ConversationID, path)
+			return
+		}
+	}
+}
+
+// recordEdit 在 AI 编辑完成时把编辑事实写入 workspace（blob + editlog + 索引）。
+// beforeExists 表示编辑前文件是否存在（区分"新建"与"清空已有文件"）。
+func (service *Service) recordEdit(stream *ActiveStream, path string, beforeExists bool, beforeContent string, afterContent string, toolCallID string) {
+	if service == nil || service.ws == nil || stream == nil {
+		return
+	}
+	conversationID := strings.TrimSpace(stream.ConversationID)
+	project := service.ws.ProjectForConversation(conversationID)
+	if project == nil {
+		return
+	}
+	path = workspace.NormalizePath(path)
+	if path == "" || !workspace.IsAbsolutePath(path) {
+		return
+	}
+	beforeHash := ""
+	if beforeExists {
+		if hash, err := project.Blobs.Put([]byte(beforeContent)); err == nil {
+			beforeHash = hash
+		}
+	}
+	afterHash := ""
+	if hash, err := project.Blobs.Put([]byte(afterContent)); err == nil {
+		afterHash = hash
+	}
+	op := workspace.DeriveOp(beforeExists, beforeHash, true, afterHash)
+	event := workspace.EditEvent{
+		ConversationID: conversationID,
+		TurnSeq:        stream.TurnSeq,
+		RequestID:      strings.TrimSpace(stream.RequestID),
+		ToolCallID:     strings.TrimSpace(toolCallID),
+		Op:             op,
+		FilePath:       path,
+		BeforeHash:     beforeHash,
+		AfterHash:      afterHash,
+		BeforeSize:     int64(len(beforeContent)),
+		AfterSize:      int64(len(afterContent)),
+		ModelName:      strings.TrimSpace(stream.ModelName),
+		ModelID:        strings.TrimSpace(stream.ModelID),
+		Source:         workspace.SourceAI,
+		CreatedAt:      time.Now().UTC(),
+	}
+	if _, err := project.Log.Record(event); err != nil {
+		log.Printf("forwarder record edit failed conversation=%s path=%s err=%v", conversationID, path, err)
+		return
+	}
+}
+
 // handleRunIntent 处理 run/prewarm 类 intent，负责建会话、写 turn 和拉起 provider。
 func (service *Service) handleRunIntent(intent InboundIntent) error {
 	intent.UserMessage = normalizeUserMessageForStorage(intent.UserMessage)
+	service.bindConversationProject(intent)
 	if !intent.Prewarm {
 		service.cancelOtherConversationActors(
 			intent.ConversationID,

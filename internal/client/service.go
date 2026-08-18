@@ -16,6 +16,7 @@ import (
 	"cursor/internal/logger"
 	"cursor/internal/mitm"
 	"cursor/internal/netproxy"
+	"cursor/internal/workspace"
 )
 
 const (
@@ -100,6 +101,14 @@ func NewProxyService(proxy *mitm.ProxyServer, certManager *certs.Manager, caCert
 		service.backendHost = host
 	}
 	return service
+}
+
+// WorkspaceManager 返回 workspace 版本系统管理器（backend 未初始化时为 nil）。
+func (s *ProxyService) WorkspaceManager() *workspace.Manager {
+	if s == nil || s.backendHost == nil {
+		return nil
+	}
+	return s.backendHost.WorkspaceManager()
 }
 
 func (s *ProxyService) ensureBackendHost() error {

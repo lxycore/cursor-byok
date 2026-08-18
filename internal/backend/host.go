@@ -20,6 +20,7 @@ import (
 	"cursor/internal/logger"
 	"cursor/internal/netproxy"
 	legacyruntime "cursor/internal/runtime"
+	"cursor/internal/workspace"
 )
 
 const healthPath = "/healthz"
@@ -32,6 +33,7 @@ type Host struct {
 	configs          *serverconfig.Manager
 	healthHTTP       *http.Client
 	controlPlaneAuth upstream.AuthorizationProvider
+	wsManager        *workspace.Manager
 
 	runMu      sync.RWMutex
 	httpServer *http.Server
@@ -68,6 +70,15 @@ func (host *Host) ConfigManager() *serverconfig.Manager {
 		return nil
 	}
 	return host.configs
+}
+
+// WorkspaceManager 返回进程级 workspace 版本系统管理器（可能为 nil）。
+// 该管理器跨 rebuild 复用，保证记录端（forwarder）与查询端（bridge）一致。
+func (host *Host) WorkspaceManager() *workspace.Manager {
+	if host == nil {
+		return nil
+	}
+	return host.wsManager
 }
 
 func (host *Host) LoadConfig(ctx context.Context) (serverconfig.Config, error) {
@@ -269,7 +280,13 @@ func (host *Host) rebuild(cfg serverconfig.Config) error {
 
 func (host *Host) rebuildLocked(cfg serverconfig.Config) error {
 	host.listenAddr = cfg.BackendListenAddr
-	agentModule := forwarder.NewModule(appdata.HistoryRootPath(), host.configs)
+	// workspace 管理器是进程级数据层：首次创建后跨 rebuild 复用，
+	// 否则前端持有的管理器实例会与记录端分离（刷新看不到新记录）。
+	if host.wsManager == nil {
+		host.wsManager = workspace.NewManager(appdata.WorkspaceRootPath())
+		_ = host.wsManager.EnsureRoot()
+	}
+	agentModule := forwarder.NewModuleWithWorkspace(appdata.HistoryRootPath(), host.configs, host.wsManager)
 	legacyBidiAppendProcedure := "/aiserver.v1.BidiService/BidiAppend"
 	legacyRunSSEProcedure := "/agent.v1.AgentService/RunSSE"
 	routeDeps := upstream.Dependencies{

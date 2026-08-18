@@ -38,6 +38,7 @@ type pendingPatchEditPayload struct {
 	Args             patchEditArgs   `json:"args,omitempty"`
 	ResolvedPath     string          `json:"resolved_path"`
 	BeforeContent    string          `json:"before_content,omitempty"`
+	BeforeExists     bool            `json:"before_exists,omitempty"`
 	AfterContent     string          `json:"after_content,omitempty"`
 	DiffString       string          `json:"diff_string,omitempty"`
 	LinesAdded       int32           `json:"lines_added,omitempty"`
@@ -201,6 +202,14 @@ func (service *Service) startHiddenPatchEditWrite(stream *ActiveStream, toolCall
 		return service.finishPatchEditOperation(stream, strings.TrimSpace(toolCallID), strings.TrimSpace(modelCallID), providerPass, reasoningContent, payload, buildEditErrorResult(payload.ResolvedPath, err.Error()))
 	}
 
+	// 并发协调：写盘前对比磁盘当前内容，行级不重叠自动合并，
+	// 重叠按策略处理（快照 + 采用 AI 意图 + 冲突事件）。
+	afterContent := service.coordinateAIWrite(stream, payload.ResolvedPath, beforeContent, computation.AfterContent)
+	if afterContent != computation.AfterContent {
+		computation.DiffString, computation.LinesAdded, computation.LinesRemoved = computeEditDiff(beforeContent, afterContent)
+		computation.AfterContent = afterContent
+	}
+
 	transportContent := preparePatchEditWriteContentsForClient(computation.AfterContent)
 	writeArgsJSON, err := json.Marshal(map[string]any{
 		"path":     strings.TrimSpace(payload.ResolvedPath),
@@ -308,6 +317,7 @@ func (service *Service) handleHiddenPatchEditExecResult(stream *ActiveStream, pe
 			}
 			return service.finishPatchEditOperation(stream, pending.ToolCallID, pending.ModelCallID, pending.ProviderPass, pending.ReasoningContent, payload, buildEditResultFromReadResult(payload.ResolvedPath, readResult))
 		}
+		payload.BeforeExists = true
 		return service.startHiddenPatchEditWrite(stream, pending.ToolCallID, pending.ModelCallID, pending.ProviderPass, pending.ReasoningContent, pending.ReasoningSignature, pending.ReasoningSignatureSource, payload, content)
 	case patchEditWriteExecKindName:
 		markExecCompleted(stream, pending)
@@ -400,6 +410,11 @@ func (service *Service) finishPatchEditOperation(stream *ActiveStream, toolCallI
 	historyToolCall := buildCompletedEditToolCall(path, compactPatchEditHistoryEditResult(path, result))
 	if err := service.appendToolResult(stream, strings.TrimSpace(toolCallID), patchEditToolName, argsJSON, summarizePatchEditResult(path, result), reasoningContent, historyToolCall); err != nil {
 		return err
+	}
+	// workspace 编辑事实记录（仅成功编辑；验证失败的异常场景不记录，
+	// 避免把不可信内容写入版本历史）
+	if result != nil && result.GetSuccess() != nil {
+		service.recordEdit(stream, path, payload.BeforeExists, payload.BeforeContent, payload.AfterContent, toolCallID)
 	}
 	if err := service.publishToolCallCompleted(stream.RequestID, strings.TrimSpace(toolCallID), strings.TrimSpace(modelCallID), toolCall); err != nil {
 		return err

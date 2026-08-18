@@ -75,3 +75,8 @@ func CACertFilePath() string {
 func CAKeyFilePath() string {
 	return filepath.Join(DataRootPath(), "ca.key")
 }
+
+// WorkspaceRootPath 返回 workspace 版本系统数据根目录。
+func WorkspaceRootPath() string {
+	return filepath.Join(DataRootPath(), "workspace")
+}

@@ -7,8 +7,25 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1007,
+          "line": 1025,
           "column": 14
+        }
+      ]
+    },
+    "02ee880f26c3b837": {
+      "source": "{0}分钟前",
+      "kind": "template",
+      "placeholders": 1,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 56,
+          "column": 28
+        },
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 162,
+          "column": 28
         }
       ]
     },
@@ -24,6 +41,18 @@
         }
       ]
     },
+    "04456f70ba80e44b": {
+      "source": "大小写匹配",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 200,
+          "column": 25
+        }
+      ]
+    },
     "04f632dd4f034d5e": {
       "source": "{0} 的上下文窗口必须为正整数",
       "kind": "template",
@@ -31,7 +60,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 443,
+          "line": 447,
           "column": 14
         }
       ]
@@ -62,6 +91,18 @@
           "file": "src/components/ModelEditor.vue",
           "line": 506,
           "column": 15
+        }
+      ]
+    },
+    "05e09a6d4a442cda": {
+      "source": "无文件变更",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 161,
+          "column": 102
         }
       ]
     },
@@ -96,7 +137,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 479,
+          "line": 483,
           "column": 14
         }
       ]
@@ -190,6 +231,18 @@
         }
       ]
     },
+    "16170723bfa07bd5": {
+      "source": "暂无协调事件",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 301,
+          "column": 20
+        }
+      ]
+    },
     "185aebe19c77425d": {
       "source": "{0}必须是 JSON 对象",
       "kind": "template",
@@ -197,7 +250,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 299,
+          "line": 303,
           "column": 14
         }
       ]
@@ -209,7 +262,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 984,
+          "line": 1002,
           "column": 47
         }
       ]
@@ -296,7 +349,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 325,
+          "line": 329,
           "column": 36
         }
       ]
@@ -313,12 +366,12 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 118,
+          "line": 119,
           "column": 21
         },
         {
           "file": "src/views/Home.vue",
-          "line": 126,
+          "line": 127,
           "column": 21
         }
       ]
@@ -342,7 +395,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 975,
+          "line": 993,
           "column": 12
         }
       ]
@@ -354,8 +407,20 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 482,
+          "line": 486,
           "column": 14
+        }
+      ]
+    },
+    "28384d7afd2e4fa6": {
+      "source": "失败",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 196,
+          "column": 35
         }
       ]
     },
@@ -413,8 +478,20 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 1049,
+          "line": 1067,
           "column": 12
+        }
+      ]
+    },
+    "2d4a2ac123bde209": {
+      "source": "个文件",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 242,
+          "column": 34
         }
       ]
     },
@@ -461,17 +538,17 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 463,
+          "line": 467,
           "column": 16
         },
         {
           "file": "src/state/appState.js",
-          "line": 469,
+          "line": 473,
           "column": 16
         },
         {
           "file": "src/state/appState.js",
-          "line": 475,
+          "line": 479,
           "column": 16
         }
       ]
@@ -536,6 +613,18 @@
         }
       ]
     },
+    "3617f737f437e998": {
+      "source": "已恢复",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 193,
+          "column": 23
+        }
+      ]
+    },
     "37d23612f78a2e63": {
       "source": "立即重启更新",
       "kind": "text",
@@ -543,7 +632,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1041,
+          "line": 1059,
           "column": 14
         }
       ]
@@ -621,6 +710,30 @@
         }
       ]
     },
+    "3b144d215e8630bb": {
+      "source": "自动合并了并发修改",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 29,
+          "column": 24
+        }
+      ]
+    },
+    "3b89c5c979059dd5": {
+      "source": "跳转到此版本",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 181,
+          "column": 12
+        }
+      ]
+    },
     "3c2a9f9901109e75": {
       "source": "{0} 的类型仅支持 OpenAI 或 Anthropic",
       "kind": "template",
@@ -628,7 +741,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 428,
+          "line": 432,
           "column": 14
         }
       ]
@@ -674,7 +787,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1005,
+          "line": 1023,
           "column": 5
         }
       ]
@@ -691,11 +804,28 @@
         }
       ]
     },
+    "3fc11b27fb443680": {
+      "source": "文件写入失败",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 31,
+          "column": 22
+        }
+      ]
+    },
     "3fd47edce45b3603": {
       "source": "关闭",
       "kind": "text",
       "placeholders": 0,
       "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 150,
+          "column": 147
+        },
         {
           "file": "src/components/ui/ContentModal.vue",
           "line": 125,
@@ -724,6 +854,18 @@
           "file": "src/components/HomeMetricsCard.vue",
           "line": 192,
           "column": 5
+        }
+      ]
+    },
+    "44ce7ae909bbb28b": {
+      "source": "搜索",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 193,
+          "column": 56
         }
       ]
     },
@@ -763,6 +905,18 @@
         }
       ]
     },
+    "4890584bb57540f5": {
+      "source": "轮次",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 144,
+          "column": 109
+        }
+      ]
+    },
     "4923eeb7bd75cccd": {
       "source": "{0} 的模型标识不能为空",
       "kind": "template",
@@ -770,7 +924,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 440,
+          "line": 444,
           "column": 14
         }
       ]
@@ -811,6 +965,18 @@
         }
       ]
     },
+    "4d016b2f1e369780": {
+      "source": "文件变更",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 143,
+          "column": 71
+        }
+      ]
+    },
     "4d2b6e53be6002e5": {
       "source": "缓存统计策略：{0}（{1}）",
       "kind": "template",
@@ -830,7 +996,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 117,
+          "line": 121,
           "column": 12
         }
       ]
@@ -929,7 +1095,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 302,
+          "line": 306,
           "column": 12
         }
       ]
@@ -1001,12 +1167,12 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 101,
+          "line": 102,
           "column": 21
         },
         {
           "file": "src/views/Home.vue",
-          "line": 111,
+          "line": 112,
           "column": 19
         }
       ]
@@ -1052,7 +1218,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 426,
+          "line": 430,
           "column": 20
         }
       ]
@@ -1076,7 +1242,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 318,
+          "line": 322,
           "column": 14
         }
       ]
@@ -1100,7 +1266,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 973,
+          "line": 991,
           "column": 14
         }
       ]
@@ -1112,8 +1278,25 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 434,
+          "line": 438,
           "column": 14
+        }
+      ]
+    },
+    "66e1a20db11a64a3": {
+      "source": "{0}小时前",
+      "kind": "template",
+      "placeholders": 1,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 57,
+          "column": 30
+        },
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 163,
+          "column": 29
         }
       ]
     },
@@ -1204,7 +1387,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 27,
+          "line": 31,
           "column": 31
         },
         {
@@ -1219,12 +1402,12 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 84,
+          "line": 85,
           "column": 34
         },
         {
           "file": "src/views/Home.vue",
-          "line": 84,
+          "line": 85,
           "column": 52
         },
         {
@@ -1236,6 +1419,18 @@
           "file": "src/views/ModelConfig.vue",
           "line": 86,
           "column": 52
+        }
+      ]
+    },
+    "6b9700bf681c776a": {
+      "source": "在 diff 中搜索...",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 195,
+          "column": 31
         }
       ]
     },
@@ -1294,7 +1489,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1220,
+          "line": 1238,
           "column": 14
         }
       ]
@@ -1381,6 +1576,30 @@
         }
       ]
     },
+    "7a54f3fc4716e900": {
+      "source": "无匹配",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 174,
+          "column": 120
+        }
+      ]
+    },
+    "7a9d6731532df8f2": {
+      "source": "将文件恢复到：\n\"{0}\"\n影响 {1} 个文件",
+      "kind": "template",
+      "placeholders": 2,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 182,
+          "column": 14
+        }
+      ]
+    },
     "7b6187c41e88b70c": {
       "source": "测试中...",
       "kind": "text",
@@ -1398,7 +1617,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 203,
+          "line": 207,
           "column": 12
         },
         {
@@ -1427,7 +1646,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 91,
+          "line": 92,
           "column": 21
         }
       ]
@@ -1461,7 +1680,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 1026,
+          "line": 1044,
           "column": 16
         }
       ]
@@ -1514,6 +1733,18 @@
         }
       ]
     },
+    "837bc95767211631": {
+      "source": "当前版本",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 177,
+          "column": 18
+        }
+      ]
+    },
     "83913e71fcf7ff60": {
       "source": "刷新成功",
       "kind": "text",
@@ -1521,7 +1752,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 108,
+          "line": 109,
           "column": 13
         }
       ]
@@ -1574,7 +1805,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 970,
+          "line": 988,
           "column": 14
         }
       ]
@@ -1649,7 +1880,7 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 187,
+          "line": 188,
           "column": 68
         }
       ]
@@ -1709,7 +1940,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 458,
+          "line": 462,
           "column": 14
         }
       ]
@@ -1803,6 +2034,18 @@
         }
       ]
     },
+    "97fb183d5d2e3508": {
+      "source": "变更",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 353,
+          "column": 102
+        }
+      ]
+    },
     "986678eccf56dc28": {
       "source": "服务状态更新中，请稍后再试",
       "kind": "text",
@@ -1810,12 +2053,12 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1325,
+          "line": 1343,
           "column": 32
         },
         {
           "file": "src/state/appState.js",
-          "line": 1346,
+          "line": 1364,
           "column": 32
         }
       ]
@@ -1875,7 +2118,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1047,
+          "line": 1065,
           "column": 14
         }
       ]
@@ -1892,6 +2135,35 @@
         }
       ]
     },
+    "9d504994e9619d07": {
+      "source": "搜索文件...",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 170,
+          "column": 31
+        }
+      ]
+    },
+    "9dc0825fba5422e4": {
+      "source": "加载中...",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 271,
+          "column": 49
+        },
+        {
+          "file": "src/components/FileDiffViewer.vue",
+          "line": 155,
+          "column": 102
+        }
+      ]
+    },
     "9e02529bcaef36c6": {
       "source": "模型渠道重复，请检查 url、modelID、apiKey、displayName、endpoint 组合",
       "kind": "text",
@@ -1899,7 +2171,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 486,
+          "line": 490,
           "column": 14
         }
       ]
@@ -1923,7 +2195,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 452,
+          "line": 456,
           "column": 14
         }
       ]
@@ -1935,12 +2207,12 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 993,
+          "line": 1011,
           "column": 12
         },
         {
           "file": "src/state/appState.js",
-          "line": 1036,
+          "line": 1054,
           "column": 87
         }
       ]
@@ -1969,7 +2241,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1270,
+          "line": 1288,
           "column": 14
         },
         {
@@ -2105,7 +2377,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1022,
+          "line": 1040,
           "column": 16
         }
       ]
@@ -2117,7 +2389,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 183,
+          "line": 184,
           "column": 47
         }
       ]
@@ -2155,6 +2427,18 @@
           "file": "src/components/ui/Switch.vue",
           "line": 11,
           "column": 38
+        }
+      ]
+    },
+    "afd0b9482dfa57f0": {
+      "source": "跳转",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 360,
+          "column": 25
         }
       ]
     },
@@ -2317,6 +2601,18 @@
         }
       ]
     },
+    "bb58d709f19dedbf": {
+      "source": "版本历史",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 252,
+          "column": 14
+        }
+      ]
+    },
     "bc87a4121a0873b3": {
       "source": "刷新统计",
       "kind": "text",
@@ -2326,6 +2622,18 @@
           "file": "src/components/HomeMetricsCard.vue",
           "line": 280,
           "column": 21
+        }
+      ]
+    },
+    "bce7c5acf4132086": {
+      "source": "暂无版本历史",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 277,
+          "column": 49
         }
       ]
     },
@@ -2348,7 +2656,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 446,
+          "line": 450,
           "column": 14
         }
       ]
@@ -2377,6 +2685,18 @@
         }
       ]
     },
+    "bf2acfa56e30f08c": {
+      "source": "操作进行中",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/state/appState.js",
+          "line": 1463,
+          "column": 32
+        }
+      ]
+    },
     "c228558cf257fc49": {
       "source": "删除失败",
       "kind": "text",
@@ -2391,6 +2711,18 @@
           "file": "src/views/ModelConfig.vue",
           "line": 266,
           "column": 21
+        }
+      ]
+    },
+    "c304ad38736dae2e": {
+      "source": "搜索...",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 258,
+          "column": 27
         }
       ]
     },
@@ -2437,7 +2769,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 186,
+          "line": 187,
           "column": 63
         }
       ]
@@ -2473,17 +2805,17 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1241,
+          "line": 1259,
           "column": 28
         },
         {
           "file": "src/state/appState.js",
-          "line": 1243,
+          "line": 1261,
           "column": 38
         },
         {
           "file": "src/state/appState.js",
-          "line": 1278,
+          "line": 1296,
           "column": 93
         }
       ]
@@ -2507,7 +2839,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 982,
+          "line": 1000,
           "column": 51
         }
       ]
@@ -2543,7 +2875,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 294,
+          "line": 298,
           "column": 12
         }
       ]
@@ -2579,7 +2911,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 437,
+          "line": 441,
           "column": 14
         }
       ]
@@ -2603,7 +2935,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1189,
+          "line": 1207,
           "column": 14
         },
         {
@@ -2625,6 +2957,18 @@
         }
       ]
     },
+    "d3a3b7205927ff56": {
+      "source": "执行了版本跳转",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 30,
+          "column": 25
+        }
+      ]
+    },
     "d3b1da3088ddd334": {
       "source": "模型测试失败",
       "kind": "text",
@@ -2632,12 +2976,12 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 206,
+          "line": 210,
           "column": 38
         },
         {
           "file": "src/state/appState.js",
-          "line": 236,
+          "line": 240,
           "column": 50
         }
       ]
@@ -2654,7 +2998,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 308,
+          "line": 312,
           "column": 49
         }
       ]
@@ -2683,7 +3027,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 329,
+          "line": 333,
           "column": 36
         }
       ]
@@ -2741,7 +3085,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 258,
+          "line": 262,
           "column": 18
         }
       ]
@@ -2753,7 +3097,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 431,
+          "line": 435,
           "column": 14
         }
       ]
@@ -2765,8 +3109,37 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1004,
+          "line": 1022,
           "column": 5
+        }
+      ]
+    },
+    "dcce4b0cc98295a1": {
+      "source": "写入冲突（磁盘内容已被 AI 覆盖）",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 28,
+          "column": 24
+        }
+      ]
+    },
+    "de6785d99e028971": {
+      "source": "刚刚",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 55,
+          "column": 27
+        },
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 161,
+          "column": 27
         }
       ]
     },
@@ -2818,7 +3191,7 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 182,
+          "line": 183,
           "column": 56
         }
       ]
@@ -2895,6 +3268,18 @@
         }
       ]
     },
+    "e921ce32c06c4b4a": {
+      "source": "已恢复。{0} 个共享文件保留了其他对话的修改（未改变）",
+      "kind": "template",
+      "placeholders": 1,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 190,
+          "column": 9
+        }
+      ]
+    },
     "eaffd48cd2ea9f1a": {
       "source": "例如：https://api.anthropic.com",
       "kind": "text",
@@ -2926,7 +3311,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 212,
+          "line": 216,
           "column": 10
         }
       ]
@@ -2938,7 +3323,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 1024,
+          "line": 1042,
           "column": 16
         }
       ]
@@ -3015,7 +3400,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 315,
+          "line": 319,
           "column": 14
         }
       ]
@@ -3027,7 +3412,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 984,
+          "line": 1002,
           "column": 38
         }
       ]
@@ -3115,12 +3500,12 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 449,
+          "line": 453,
           "column": 14
         },
         {
           "file": "src/state/appState.js",
-          "line": 455,
+          "line": 459,
           "column": 14
         }
       ]
@@ -3134,6 +3519,30 @@
           "file": "src/layouts/MainLayout.vue",
           "line": 50,
           "column": 10
+        }
+      ]
+    },
+    "fa4b03ef9f4c7104": {
+      "source": "协调事件",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 291,
+          "column": 23
+        }
+      ]
+    },
+    "fa5d15d544ba9a70": {
+      "source": "{0}天前",
+      "kind": "template",
+      "placeholders": 1,
+      "refs": [
+        {
+          "file": "src/components/EditHistoryCard.vue",
+          "line": 164,
+          "column": 27
         }
       ]
     },
@@ -3164,7 +3573,7 @@
         },
         {
           "file": "src/state/appState.js",
-          "line": 1043,
+          "line": 1061,
           "column": 12
         }
       ]
@@ -3176,7 +3585,7 @@
       "refs": [
         {
           "file": "src/state/appState.js",
-          "line": 982,
+          "line": 1000,
           "column": 40
         }
       ]

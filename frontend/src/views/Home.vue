@@ -3,6 +3,7 @@ import Button from "@/components/ui/Button.vue";
 import Card from "@/components/ui/Card.vue";
 import HomeMetricsCard from "@/components/HomeMetricsCard.vue";
 import CursorAccountCard from "@/components/CursorAccountCard.vue";
+import EditHistoryCard from "@/components/EditHistoryCard.vue";
 import { useMessage } from "@/composables/useMessage";
 import { getAdRuntime } from "@/services/clientApi";
 import {
@@ -188,5 +189,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </Card>
+
+    <EditHistoryCard />
   </div>
 </template>

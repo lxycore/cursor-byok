@@ -17,6 +17,10 @@ import {
   stopProxyService,
   testModelAdapter,
   fetchModelAdapterModels,
+  getTurnDiff,
+  listRecentTurns,
+  jumpToTurn,
+  listProjectEvents,
 } from "@/services/clientApi";
 import {
   normalizeReasoningEffort,
@@ -858,6 +862,20 @@ export const appState = reactive({
   updatePromptVisible: false,
   updatePromptKind: "idle",
   updatePromptBusy: false,
+
+  // Edit history（编辑历史 / 版本跳转）
+  recentTurns: [],
+  recentTurnsLoading: false,
+  recentTurnsError: "",
+  undoingTurn: false,
+
+  // Project coordination events（合并 / 冲突 / 跳转 / 写失败）
+  projectEvents: {},
+
+  // Turn diff viewer（轮次差异查看）
+  turnDiff: null,
+  turnDiffLoading: false,
+  turnDiffError: "",
 });
 
 watchSyncEffect(() => {
@@ -1410,6 +1428,74 @@ export function toUserError(error) {
   return message || GENERIC_SERVICE_ERROR;
 }
 
+export async function fetchRecentTurns(limit) {
+  const maxLimit = typeof limit === "number" ? limit : 100;
+  appState.recentTurnsLoading = true;
+  appState.recentTurnsError = "";
+  try {
+    appState.recentTurns = await listRecentTurns(maxLimit);
+  } catch (error) {
+    appState.recentTurnsError = toUserError(error);
+    appState.recentTurns = [];
+  } finally {
+    appState.recentTurnsLoading = false;
+  }
+}
+
+// fetchProjectEvents 拉取指定项目的协调事件（冲突 / 手改 / 移动等）。
+export async function fetchProjectEvents(projectRoot, limit = 50) {
+  const root = asString(projectRoot);
+  if (!root) return [];
+  try {
+    const events = await listProjectEvents(root, limit, 0);
+    appState.projectEvents = {
+      ...appState.projectEvents,
+      [root]: Array.isArray(events) ? events : [],
+    };
+    return appState.projectEvents[root];
+  } catch (_error) {
+    return [];
+  }
+}
+
+export async function jumpToTurnById(conversationID, turnSeq) {
+  if (appState.undoingTurn) {
+    return { ok: false, error: "操作进行中" };
+  }
+  appState.undoingTurn = true;
+  try {
+    const result = await jumpToTurn(conversationID, turnSeq);
+    await fetchRecentTurns();
+    return { ok: true, result };
+  } catch (error) {
+    return { ok: false, error: toUserError(error) };
+  } finally {
+    appState.undoingTurn = false;
+  }
+}
+
+export async function fetchTurnDiff(conversationID, turnSeq) {
+  appState.turnDiffLoading = true;
+  appState.turnDiffError = "";
+  appState.turnDiff = null;
+  try {
+    const result = await getTurnDiff(conversationID, turnSeq);
+    appState.turnDiff = result;
+    return result;
+  } catch (error) {
+    appState.turnDiffError = toUserError(error);
+    return null;
+  } finally {
+    appState.turnDiffLoading = false;
+  }
+}
+
+export function clearTurnDiff() {
+  appState.turnDiff = null;
+  appState.turnDiffLoading = false;
+  appState.turnDiffError = "";
+}
+
 export async function bootstrapAppState() {
   try {
     await reloadUserConfig();
@@ -1424,4 +1510,5 @@ export async function bootstrapAppState() {
   }
   await syncServiceState().catch(() => {});
   await syncHomeMetrics().catch(() => {});
+  await fetchRecentTurns(100).catch(() => {});
 }

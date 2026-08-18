@@ -23,10 +23,15 @@ import {
   OpenHistoryWindow,
   OpenModelConfigWindow,
 } from "@bindings/cursor/internal/bridge/windowservice.js";
+import {
+  ListRecentTurns,
+  JumpToTurn,
+} from "@bindings/cursor/internal/bridge/historyservice.js";
 import { Call } from "@wailsio/runtime";
 
 const API_LOG_PREFIX = "[clientApi]";
 const PROXY_SERVICE_NAME = "cursor/internal/bridge.ProxyService";
+const HISTORY_SERVICE_NAME = "cursor/internal/bridge.HistoryService";
 
 function logSuccess(name, payload, result) {
   console.log(`${API_LOG_PREFIX} ${name} response`, {
@@ -153,5 +158,27 @@ export function getModelAdapterTestResults() {
 export function fetchModelAdapterModels(payload) {
   return withApiLogging("FetchModelAdapterModels", payload, () =>
     Call.ByName(`${PROXY_SERVICE_NAME}.FetchModelAdapterModels`, payload),
+  );
+}
+
+export function listRecentTurns(limit) {
+  return withApiLogging("ListRecentTurns", { limit }, () => ListRecentTurns(limit));
+}
+
+export function jumpToTurn(conversationID, turnSeq) {
+  return withApiLogging("JumpToTurn", { conversationID, turnSeq }, () =>
+    JumpToTurn(conversationID, turnSeq),
+  );
+}
+
+export function getTurnDiff(conversationID, turnSeq) {
+  return withApiLogging("GetTurnDiff", { conversationID, turnSeq }, () =>
+    Call.ByName(`${HISTORY_SERVICE_NAME}.GetTurnDiff`, conversationID, turnSeq),
+  );
+}
+
+export function listProjectEvents(projectRoot, limit = 50, sinceSeq = 0) {
+  return withApiLogging("ProjectEvents", { projectRoot, limit, sinceSeq }, () =>
+    Call.ByName(`${HISTORY_SERVICE_NAME}.ProjectEvents`, projectRoot, limit, sinceSeq),
   );
 }

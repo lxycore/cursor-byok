@@ -122,6 +122,7 @@ func Run(resources EmbeddedResources) error {
 		},
 	})
 	adService := bridge.NewAdService(adCore)
+	historyService := bridge.NewHistoryService(appdata.HistoryRootPath(), proxyService.WorkspaceManager())
 	var updateManager *updater.Manager
 
 	var mainWindow *application.WebviewWindow
@@ -136,6 +137,7 @@ func Run(resources EmbeddedResources) error {
 			application.NewService(metricsService),
 			application.NewService(windowService),
 			application.NewService(adService),
+			application.NewService(historyService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(resources.Assets),
