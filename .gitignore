@@ -25,3 +25,27 @@ cmd/ads-server/data/
 cmd/ads-server/ads-server
 cmd/ads-server/ads-server-linux-amd64.tar
 cursor-tab-server/cursor-tab-server-linux-amd64.tar
+
+# ── 密钥 / 本地配置（防止误提交敏感信息） ──
+# 用户本地配置（真实 API Key 存放于仓库外的 ~/.cursor-local-assistant-v2/config.yaml）
+.cursor-local-assistant/
+.cursor-local-assistant-v2/
+# 可能包含 token / API Key 的配置文件
+config.yaml
+config.yml
+*.env
+.env
+.env.*
+.envrc
+# 密钥 / 证书 / 凭据文件
+*.secret
+credentials
+.credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_rsa.pub
+id_ed25519
