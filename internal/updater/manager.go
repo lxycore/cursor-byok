@@ -74,6 +74,7 @@ type Manager struct {
 	currentInfo    *UpdateInfo
 	readyInfo      *UpdateInfo
 	downloadedPath string
+	disabled       bool
 }
 
 func NewManager(app *application.App) *Manager {
@@ -87,9 +88,14 @@ func NewManager(app *application.App) *Manager {
 	}
 }
 
-func (m *Manager) Start() {
+func (m *Manager) Start(disableAutoUpdate bool) {
+	m.mu.Lock()
+	m.disabled = disableAutoUpdate
+	m.mu.Unlock()
 	m.emitState(StateIdle, nil, "", "", false, "")
-	go m.loop()
+	if !disableAutoUpdate {
+		go m.loop()
+	}
 }
 
 func (m *Manager) Shutdown() {

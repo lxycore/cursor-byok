@@ -93,6 +93,9 @@ func (router *Router) Stream(ctx context.Context, req StreamRequest, sink func(M
 		resolved.ProviderModelID = strings.TrimSpace(req.ModelID)
 	}
 	resolved.Messages = sanitizeProviderMessages(req.Messages)
+	if channel.VisionEnabled {
+		resolved.Messages = ConvertImageMessagesWithVision(ctx, resolved.Messages, visionConfigFromChannel(channel))
+	}
 	if resolved.RequestKnobs != nil {
 		resolved.RequestKnobs["max_tokens"] = resolved.MaxTokens
 		if runtimeThinkingEffort != "" {
@@ -416,4 +419,37 @@ func openAIReasoningEffortFromRuntime(runtimeThinkingEffort string) string {
 	default:
 		return ""
 	}
+}
+
+// visionConfigFromChannel 从已解析渠道构建远程视觉模型配置：
+// 开启“跟随主模型配置”时 provider/baseURL/apiKey 全部继承主模型；
+// 否则使用视觉专用字段，为空的部分回退到主模型配置。
+func visionConfigFromChannel(channel *legacyruntime.ResolvedChannel) VisionConfig {
+	if channel == nil {
+		return VisionConfig{}
+	}
+	cfg := VisionConfig{
+		Mode:                strings.TrimSpace(channel.VisionMode),
+		UseProviderDefaults: channel.VisionUseProviderDefaults,
+		ProviderType:        strings.TrimSpace(channel.VisionProviderType),
+		ModelID:             strings.TrimSpace(channel.VisionModelID),
+		BaseURL:             strings.TrimSpace(channel.VisionBaseURL),
+		APIKey:              strings.TrimSpace(channel.VisionAPIKey),
+	}
+	if cfg.Mode == "" {
+		cfg.Mode = "local"
+	}
+	provider := strings.TrimSpace(channel.Provider)
+	baseURL := strings.TrimSpace(channel.BaseURL)
+	apiKey := strings.TrimSpace(channel.APIKey)
+	if cfg.UseProviderDefaults || cfg.ProviderType == "" {
+		cfg.ProviderType = provider
+	}
+	if cfg.UseProviderDefaults || cfg.BaseURL == "" {
+		cfg.BaseURL = baseURL
+	}
+	if cfg.UseProviderDefaults || cfg.APIKey == "" {
+		cfg.APIKey = apiKey
+	}
+	return cfg
 }

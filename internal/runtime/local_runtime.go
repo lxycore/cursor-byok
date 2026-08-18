@@ -63,6 +63,20 @@ type ModelAdapterConfig struct {
 	CustomHeadersEnabled bool `json:"customHeadersEnabled"`
 	// CustomHeadersJSON 表示自定义请求头 JSON 对象。
 	CustomHeadersJSON string `json:"customHeadersJSON"`
+	// VisionEnabled 表示是否启用图片转文字（图片输入支持）。
+	VisionEnabled bool `json:"visionEnabled"`
+	// VisionMode 表示图片输入的处理方式：local（本机 ds-vision）或 remote（远程视觉模型）。
+	VisionMode string `json:"visionMode"`
+	// VisionUseProviderDefaults 表示远程视觉模型是否跟随主模型的 provider/baseURL/apiKey。
+	VisionUseProviderDefaults bool `json:"visionUseProviderDefaults"`
+	// VisionProviderType 表示远程视觉模型的服务提供商类型：openai 或 anthropic。
+	VisionProviderType string `json:"visionProviderType"`
+	// VisionModelID 表示远程视觉模型的模型标识。
+	VisionModelID string `json:"visionModelID"`
+	// VisionBaseURL 表示远程视觉模型的 API 根地址。
+	VisionBaseURL string `json:"visionBaseURL"`
+	// VisionAPIKey 表示远程视觉模型的访问密钥。
+	VisionAPIKey string `json:"visionAPIKey"`
 	// AnthropicExtraParamsEnabled 表示是否启用 Anthropic 额外请求参数。
 	AnthropicExtraParamsEnabled bool `json:"anthropicExtraParamsEnabled"`
 	// AnthropicExtraParamsJSON 表示 Anthropic 额外请求参数 JSON 对象。
@@ -130,6 +144,19 @@ func NormalizeModelAdapterConfigs(input []ModelAdapterConfig) ([]ModelAdapterCon
 		}
 		next.CustomHeadersEnabled = item.CustomHeadersEnabled
 		next.CustomHeadersJSON = strings.TrimSpace(item.CustomHeadersJSON)
+		next.VisionEnabled = item.VisionEnabled
+		next.VisionMode = normalizeVisionMode(item.VisionMode)
+		next.VisionUseProviderDefaults = item.VisionUseProviderDefaults
+		next.VisionProviderType = normalizeVisionProviderType(item.VisionProviderType)
+		next.VisionModelID = strings.TrimSpace(item.VisionModelID)
+		if strings.TrimSpace(item.VisionBaseURL) != "" {
+			visionBaseURL, visionErr := modelchannel.NormalizeBaseURL(item.VisionBaseURL)
+			if visionErr != nil {
+				return nil, visionErr
+			}
+			next.VisionBaseURL = visionBaseURL
+		}
+		next.VisionAPIKey = strings.TrimSpace(item.VisionAPIKey)
 		switch {
 		case next.DisplayName == "":
 			return nil, errors.New("模型适配器 displayName 不能为空")
@@ -159,6 +186,8 @@ func NormalizeModelAdapterConfigs(input []ModelAdapterConfig) ([]ModelAdapterCon
 			}
 		case next.Type == "anthropic" && next.AnthropicThinkingEffort == "":
 			return nil, errors.New("模型适配器 anthropicThinkingEffort 仅支持 low、medium、high、xhigh、max")
+		case next.VisionEnabled && next.VisionMode == "remote" && strings.TrimSpace(next.VisionModelID) == "":
+			return nil, errors.New("模型适配器 visionModelID 不能为空（远程视觉模型）")
 		}
 		next.ID = modelchannel.BuildChannelID(next.BaseURL, next.ModelID, next.APIKey, next.DisplayName, next.OpenAIEndpoint)
 		if _, exists := seenChannelIDs[next.ID]; exists {
@@ -302,6 +331,20 @@ type ResolvedChannel struct {
 	CustomHeadersEnabled bool
 	// CustomHeadersJSON 表示自定义请求头 JSON 对象。
 	CustomHeadersJSON string
+	// VisionEnabled 表示是否启用图片转文字（图片输入支持）。
+	VisionEnabled bool
+	// VisionMode 表示图片输入的处理方式：local（本机 ds-vision）或 remote（远程视觉模型）。
+	VisionMode string
+	// VisionUseProviderDefaults 表示远程视觉模型是否跟随主模型的 provider/baseURL/apiKey。
+	VisionUseProviderDefaults bool
+	// VisionProviderType 表示远程视觉模型的服务提供商类型：openai 或 anthropic。
+	VisionProviderType string
+	// VisionModelID 表示远程视觉模型的模型标识。
+	VisionModelID string
+	// VisionBaseURL 表示远程视觉模型的 API 根地址。
+	VisionBaseURL string
+	// VisionAPIKey 表示远程视觉模型的访问密钥。
+	VisionAPIKey string
 	// AnthropicExtraParamsEnabled 表示是否启用 Anthropic 额外请求参数。
 	AnthropicExtraParamsEnabled bool
 	// AnthropicExtraParamsJSON 表示 Anthropic 额外请求参数 JSON 对象。
@@ -530,4 +573,28 @@ func (s *LocalSystemSettingService) load(ctx context.Context) (RuntimeConfigSnap
 		return RuntimeConfigSnapshot{}, nil
 	}
 	return s.provider(ctx)
+}
+
+// normalizeVisionMode 归一化图片输入的处理方式。空值等价于 local（本机 ds-vision 识别）。
+func normalizeVisionMode(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "remote":
+		return "remote"
+	case "", "local":
+		return "local"
+	default:
+		return "local"
+	}
+}
+
+// normalizeVisionProviderType 归一化远程视觉模型的服务提供商类型。空值表示跟随主模型适配器。
+func normalizeVisionProviderType(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "openai":
+		return "openai"
+	case "anthropic":
+		return "anthropic"
+	default:
+		return ""
+	}
 }

@@ -171,12 +171,51 @@ func (s *ProxyService) ShutdownForQuit() {
 	s.core.ShutdownForQuit()
 }
 
+// VisionChannelStatus 描述本机 ds-vision-skill 的一个视觉通道。
+type VisionChannelStatus = client.VisionChannelStatus
+
+// VisionSkillStatusResult 描述本机 ds-vision-skill 的整体状态。
+type VisionSkillStatusResult = client.VisionSkillStatusResult
+
+// TestVisionResult 定义一次视觉测试的结果。
+type TestVisionResult = client.TestVisionResult
+
+// TestRemoteVisionRequest 定义远程视觉模型测试的请求参数。
+type TestRemoteVisionRequest = client.TestRemoteVisionRequest
+
+// TestLocalVisionRequest 定义本机 ds-vision 通道测试的请求参数。
+type TestLocalVisionRequest = client.TestLocalVisionRequest
+
 // WorkspaceManager 返回 workspace 版本系统管理器（可能为 nil）。
 func (s *ProxyService) WorkspaceManager() *workspace.Manager {
 	if s == nil || s.core == nil {
 		return nil
 	}
 	return s.core.WorkspaceManager()
+}
+
+// GetVisionSkillStatus 返回本机 ds-vision-skill 的视觉通道状态（“本机识别”展示）。
+func (s *ProxyService) GetVisionSkillStatus() VisionSkillStatusResult {
+	if s == nil || s.core == nil {
+		return VisionSkillStatusResult{}
+	}
+	return s.core.GetVisionSkillStatus()
+}
+
+// TestRemoteVision 用一张测试图片验证远程视觉模型是否可用。
+func (s *ProxyService) TestRemoteVision(req TestRemoteVisionRequest) TestVisionResult {
+	if s == nil || s.core == nil {
+		return TestVisionResult{}
+	}
+	return s.core.TestRemoteVision(req)
+}
+
+// TestLocalVisionChannel 用一张测试图片验证本机 ds-vision 指定通道是否可用。
+func (s *ProxyService) TestLocalVisionChannel(req TestLocalVisionRequest) TestVisionResult {
+	if s == nil || s.core == nil {
+		return TestVisionResult{}
+	}
+	return s.core.TestLocalVisionChannel(req)
 }
 
 // IsWindows 用于处理与 IsWindows 相关的逻辑。

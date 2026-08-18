@@ -267,6 +267,13 @@ export function createEmptyModelAdapter() {
     openAIExtraParamsJSON: OPENAI_EXTRA_PARAMS_DEFAULT_JSON,
     customHeadersEnabled: false,
     customHeadersJSON: CUSTOM_HEADERS_DEFAULT_JSON,
+    visionEnabled: false,
+    visionMode: "local",
+    visionUseProviderDefaults: true,
+    visionProviderType: "openai",
+    visionModelID: "",
+    visionBaseURL: "",
+    visionAPIKey: "",
     anthropicExtraParamsEnabled: false,
     anthropicExtraParamsJSON: EXTRA_PARAMS_DEFAULT_JSON,
     contextWindowTokens: 0,
@@ -290,6 +297,19 @@ function normalizeOpenAIEndpoint(value) {
 
 function isValidOpenAIEndpoint(value) {
   return normalizeOpenAIEndpoint(value) !== "";
+}
+
+function normalizeVisionMode(value) {
+  const text = asString(value).toLowerCase();
+  return text === "remote" ? "remote" : "local";
+}
+
+function normalizeVisionProviderType(value) {
+  const text = asString(value).toLowerCase();
+  if (text === "anthropic") {
+    return "anthropic";
+  }
+  return "openai";
 }
 
 function validateJSONObject(value, label) {
@@ -375,6 +395,16 @@ export function normalizeModelAdapter(source) {
     openAIExtraParamsJSON,
     customHeadersEnabled,
     customHeadersJSON,
+    visionEnabled: asBoolean(raw.visionEnabled ?? raw.vision_enabled),
+    visionMode: normalizeVisionMode(raw.visionMode ?? raw.vision_mode),
+    visionUseProviderDefaults: asBoolean(
+      raw.visionUseProviderDefaults ?? raw.vision_use_provider_defaults ?? raw.visionUseProviderDefault,
+      true,
+    ),
+    visionProviderType: normalizeVisionProviderType(raw.visionProviderType ?? raw.vision_provider_type),
+    visionModelID: asString(raw.visionModelID ?? raw.vision_model_id),
+    visionBaseURL: normalizeBaseURL(raw.visionBaseURL ?? raw.vision_base_url),
+    visionAPIKey: asString(raw.visionAPIKey ?? raw.vision_api_key),
     anthropicExtraParamsEnabled,
     anthropicExtraParamsJSON,
     contextWindowTokens: asPositiveInteger(
@@ -485,6 +515,9 @@ export function validateModelAdapters(source) {
     if (adapter.thinkingBudgetTokens && (!Number.isInteger(adapter.thinkingBudgetTokens) || adapter.thinkingBudgetTokens <= 0)) {
       return `${prefix} 的思考预算 Token 必须为正整数`;
     }
+    if (adapter.visionEnabled && adapter.visionMode === "remote" && !adapter.visionModelID) {
+      return `${prefix} 的远程视觉模型标识不能为空`;
+    }
     const dedupeKey = buildModelAdapterIdentityKey(adapter);
     if (seenIdentityKeys.has(dedupeKey)) {
       return `模型渠道重复，请检查 url、modelID、apiKey、displayName、endpoint 组合`;
@@ -542,12 +575,14 @@ function normalizeConfig(source) {
   const homeMetrics = raw.homeMetrics && typeof raw.homeMetrics === "object" ? raw.homeMetrics : {};
   return {
     log: asBoolean(raw.log),
+    disableAutoUpdate: asBoolean(raw.disableAutoUpdate),
     providerStreamIdleTimeout: asPositiveInteger(raw.providerStreamIdleTimeout),
     backendListenAddr: asString(raw.configBackendListenAddr) || asString(raw.backendListenAddr),
     proxyListenAddr: asString(raw.configProxyListenAddr) || asString(raw.proxyListenAddr),
     modelAdapters: normalizeModelAdapters(raw.modelAdapters),
     homeMetrics: {
       includeCacheWriteInHitRate: asBoolean(homeMetrics.includeCacheWriteInHitRate),
+      disableAds: asBoolean(homeMetrics.disableAds),
     },
     lastAgentModelHash: asString(raw.lastAgentModelHash),
   };
@@ -584,6 +619,7 @@ function buildConfigPayload(source = appState) {
   const normalized = normalizeConfig(source);
   return {
     log: normalized.log,
+    disableAutoUpdate: normalized.disableAutoUpdate,
     providerStreamIdleTimeout: normalized.providerStreamIdleTimeout,
     backendListenAddr: normalized.backendListenAddr,
     proxyListenAddr: normalized.proxyListenAddr,
@@ -602,7 +638,9 @@ function applyConfigToState(config, { modelAdaptersOnly = false } = {}) {
   appState.modelAdapters = normalized.modelAdapters;
   appState.configBackendListenAddr = normalized.backendListenAddr;
   appState.configProxyListenAddr = normalized.proxyListenAddr;
+  appState.disableAutoUpdate = normalized.disableAutoUpdate;
   appState.includeCacheWriteInHitRate = normalized.homeMetrics.includeCacheWriteInHitRate;
+  appState.disableAds = normalized.homeMetrics.disableAds;
   return normalized;
 }
 
@@ -825,7 +863,9 @@ export const appState = reactive({
   modelAdapterTestResults: {},
   configBackendListenAddr: cachedConfig.backendListenAddr,
   configProxyListenAddr: cachedConfig.proxyListenAddr,
+  disableAutoUpdate: cachedConfig.disableAutoUpdate,
   includeCacheWriteInHitRate: cachedConfig.homeMetrics.includeCacheWriteInHitRate,
+  disableAds: cachedConfig.homeMetrics.disableAds,
 
   serviceRunning: asBoolean(cachedState.serviceRunning),
   backendRunning: asBoolean(cachedState.backendRunning),
@@ -1151,6 +1191,39 @@ export async function saveIncludeCacheWriteInHitRate(value) {
   });
   if (!result.ok) {
     appState.includeCacheWriteInHitRate = previousValue;
+  }
+  return result;
+}
+
+export async function saveDisableAds(disabled) {
+  const currentConfig = await loadPersistedUserConfig();
+  const previousValue = appState.disableAds;
+  const nextValue = asBoolean(disabled);
+  appState.disableAds = nextValue;
+  const result = await persistConfigPayload({
+    ...currentConfig,
+    homeMetrics: {
+      ...currentConfig.homeMetrics,
+      disableAds: nextValue,
+    },
+  });
+  if (!result.ok) {
+    appState.disableAds = previousValue;
+  }
+  return result;
+}
+
+export async function saveAutoUpdateSetting(disabled) {
+  const currentConfig = await loadPersistedUserConfig();
+  const nextValue = asBoolean(disabled);
+  const previousValue = appState.disableAutoUpdate;
+  appState.disableAutoUpdate = nextValue;
+  const result = await persistConfigPayload({
+    ...currentConfig,
+    disableAutoUpdate: nextValue,
+  });
+  if (!result.ok) {
+    appState.disableAutoUpdate = previousValue;
   }
   return result;
 }

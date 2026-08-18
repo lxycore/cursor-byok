@@ -35,6 +35,13 @@ type ModelAdapterConfig struct {
 	OpenAIExtraParamsJSON       string `json:"openAIExtraParamsJSON" yaml:"openAIExtraParamsJSON"`
 	CustomHeadersEnabled        bool   `json:"customHeadersEnabled" yaml:"customHeadersEnabled"`
 	CustomHeadersJSON           string `json:"customHeadersJSON" yaml:"customHeadersJSON"`
+	VisionEnabled               bool   `json:"visionEnabled" yaml:"visionEnabled"`
+	VisionMode                  string `json:"visionMode" yaml:"visionMode"`
+	VisionUseProviderDefaults   bool   `json:"visionUseProviderDefaults" yaml:"visionUseProviderDefaults"`
+	VisionProviderType          string `json:"visionProviderType" yaml:"visionProviderType"`
+	VisionModelID               string `json:"visionModelID" yaml:"visionModelID"`
+	VisionBaseURL               string `json:"visionBaseURL" yaml:"visionBaseURL"`
+	VisionAPIKey                string `json:"visionAPIKey" yaml:"visionAPIKey"`
 	AnthropicExtraParamsEnabled bool   `json:"anthropicExtraParamsEnabled" yaml:"anthropicExtraParamsEnabled"`
 	AnthropicExtraParamsJSON    string `json:"anthropicExtraParamsJSON" yaml:"anthropicExtraParamsJSON"`
 	ContextWindowTokens         int    `json:"contextWindowTokens" yaml:"contextWindowTokens"`
@@ -46,10 +53,12 @@ type ModelAdapterConfig struct {
 
 type HomeMetricsConfig struct {
 	IncludeCacheWriteInHitRate bool `json:"includeCacheWriteInHitRate" yaml:"includeCacheWriteInHitRate"`
+	DisableAds                 bool `json:"disableAds" yaml:"disableAds"`
 }
 
 type Config struct {
 	Log                       bool                 `json:"log" yaml:"log"`
+	DisableAutoUpdate         bool                 `json:"disableAutoUpdate" yaml:"disableAutoUpdate"`
 	ProviderStreamIdleTimeout int                  `json:"providerStreamIdleTimeout" yaml:"providerStreamIdleTimeout"`
 	BackendListenAddr         string               `json:"backendListenAddr" yaml:"backendListenAddr"`
 	ProxyListenAddr           string               `json:"proxyListenAddr" yaml:"proxyListenAddr"`
@@ -71,6 +80,7 @@ func DefaultConfig() Config {
 func NormalizeConfig(input Config) (Config, error) {
 	output := DefaultConfig()
 	output.Log = input.Log
+	output.DisableAutoUpdate = input.DisableAutoUpdate
 	output.ProviderStreamIdleTimeout = normalizeProviderStreamIdleTimeout(input.ProviderStreamIdleTimeout)
 	backendListenAddr, err := normalizeListenAddr(input.BackendListenAddr, DefaultBackendListenAddr, "backendListenAddr")
 	if err != nil {
@@ -83,6 +93,7 @@ func NormalizeConfig(input Config) (Config, error) {
 	output.BackendListenAddr = backendListenAddr
 	output.ProxyListenAddr = proxyListenAddr
 	output.HomeMetrics.IncludeCacheWriteInHitRate = input.HomeMetrics.IncludeCacheWriteInHitRate
+	output.HomeMetrics.DisableAds = input.HomeMetrics.DisableAds
 	output.LastAgentModelHash = strings.TrimSpace(input.LastAgentModelHash)
 	adapters, err := NormalizeModelAdapterConfigs(input.ModelAdapters)
 	if err != nil {
@@ -130,6 +141,19 @@ func NormalizeModelAdapterConfigs(input []ModelAdapterConfig) ([]ModelAdapterCon
 		}
 		next.CustomHeadersEnabled = item.CustomHeadersEnabled
 		next.CustomHeadersJSON = strings.TrimSpace(item.CustomHeadersJSON)
+		next.VisionEnabled = item.VisionEnabled
+		next.VisionMode = normalizeVisionMode(item.VisionMode)
+		next.VisionUseProviderDefaults = item.VisionUseProviderDefaults
+		next.VisionProviderType = normalizeVisionProviderType(item.VisionProviderType)
+		next.VisionModelID = strings.TrimSpace(item.VisionModelID)
+		if strings.TrimSpace(item.VisionBaseURL) != "" {
+			visionBaseURL, visionErr := modelchannel.NormalizeBaseURL(item.VisionBaseURL)
+			if visionErr != nil {
+				return nil, visionErr
+			}
+			next.VisionBaseURL = visionBaseURL
+		}
+		next.VisionAPIKey = strings.TrimSpace(item.VisionAPIKey)
 		switch {
 		case next.DisplayName == "":
 			return nil, errors.New("模型适配器 displayName 不能为空")
@@ -159,6 +183,8 @@ func NormalizeModelAdapterConfigs(input []ModelAdapterConfig) ([]ModelAdapterCon
 			}
 		case next.Type == "anthropic" && next.AnthropicThinkingEffort == "":
 			return nil, errors.New("模型适配器 anthropicThinkingEffort 仅支持 low、medium、high、xhigh、max")
+		case next.VisionEnabled && next.VisionMode == "remote" && strings.TrimSpace(next.VisionModelID) == "":
+			return nil, errors.New("模型适配器 visionModelID 不能为空（远程视觉模型）")
 		}
 		next.ID = modelchannel.BuildChannelID(next.BaseURL, next.ModelID, next.APIKey, next.DisplayName, next.OpenAIEndpoint)
 		if _, exists := seenChannelIDs[next.ID]; exists {
@@ -284,6 +310,30 @@ func normalizeMaxCompletionTokens(value int) int {
 }
 
 func normalizeModelAdapterType(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "openai":
+		return "openai"
+	case "anthropic":
+		return "anthropic"
+	default:
+		return ""
+	}
+}
+
+// normalizeVisionMode 归一化图片输入的处理方式。空值等价于 local（本机 ds-vision 识别）。
+func normalizeVisionMode(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "remote":
+		return "remote"
+	case "", "local":
+		return "local"
+	default:
+		return "local"
+	}
+}
+
+// normalizeVisionProviderType 归一化远程视觉模型的服务提供商类型。空值表示跟随主模型适配器。
+func normalizeVisionProviderType(value string) string {
 	switch strings.ToLower(strings.TrimSpace(value)) {
 	case "openai":
 		return "openai"

@@ -182,3 +182,21 @@ export function listProjectEvents(projectRoot, limit = 50, sinceSeq = 0) {
     Call.ByName(`${HISTORY_SERVICE_NAME}.ProjectEvents`, projectRoot, limit, sinceSeq),
   );
 }
+
+export function getVisionSkillStatus() {
+  return withApiLogging("GetVisionSkillStatus", undefined, () =>
+    Call.ByName(`${PROXY_SERVICE_NAME}.GetVisionSkillStatus`),
+  );
+}
+
+export function testRemoteVision(request) {
+  return withApiLogging("TestRemoteVision", request, () =>
+    Call.ByName(`${PROXY_SERVICE_NAME}.TestRemoteVision`, request),
+  );
+}
+
+export function testLocalVisionChannel(request) {
+  return withApiLogging("TestLocalVisionChannel", request, () =>
+    Call.ByName(`${PROXY_SERVICE_NAME}.TestLocalVisionChannel`, request),
+  );
+}

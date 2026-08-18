@@ -378,7 +378,11 @@ func Run(resources EmbeddedResources) error {
 	})
 	app.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
 		logger.Infof("应用版本：v%s", buildinfo.CurrentVersion())
-		updateManager.Start()
+		disableAutoUpdate := false
+		if cfg, err := proxyService.LoadUserConfig(); err == nil {
+			disableAutoUpdate = cfg.DisableAutoUpdate
+		}
+		updateManager.Start(disableAutoUpdate)
 		startAdRefreshLoop(adRefreshCtx)
 		go func() {
 			logger.Infof("application started, begin auto start service in background")
