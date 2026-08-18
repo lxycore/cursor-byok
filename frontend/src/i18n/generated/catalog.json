@@ -431,12 +431,12 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 119,
+          "line": 122,
           "column": 21
         },
         {
           "file": "src/views/Home.vue",
-          "line": 127,
+          "line": 144,
           "column": 21
         }
       ]
@@ -462,6 +462,18 @@
           "file": "src/components/HomeMetricsCard.vue",
           "line": 178,
           "column": 5
+        }
+      ]
+    },
+    "25693b3877280973": {
+      "source": "完全退出 CursorUltra，不再后台运行",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/views/Home.vue",
+          "line": 215,
+          "column": 47
         }
       ]
     },
@@ -569,6 +581,11 @@
           "file": "src/state/appState.js",
           "line": 1107,
           "column": 12
+        },
+        {
+          "file": "src/views/Home.vue",
+          "line": 131,
+          "column": 17
         }
       ]
     },
@@ -1090,6 +1107,23 @@
         }
       ]
     },
+    "498e1d59b4d787ee": {
+      "source": "退出",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/views/Home.vue",
+          "line": 130,
+          "column": 18
+        },
+        {
+          "file": "src/views/Home.vue",
+          "line": 217,
+          "column": 58
+        }
+      ]
+    },
     "4b5e0ae1288a9695": {
       "source": "没有匹配的模型",
       "kind": "text",
@@ -1400,12 +1434,12 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 102,
+          "line": 105,
           "column": 21
         },
         {
           "file": "src/views/Home.vue",
-          "line": 112,
+          "line": 115,
           "column": 19
         }
       ]
@@ -1627,6 +1661,11 @@
           "file": "src/router/index.js",
           "line": 17,
           "column": 39
+        },
+        {
+          "file": "src/views/Home.vue",
+          "line": 205,
+          "column": 69
         }
       ]
     },
@@ -1701,12 +1740,12 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 85,
+          "line": 88,
           "column": 34
         },
         {
           "file": "src/views/Home.vue",
-          "line": 85,
+          "line": 88,
           "column": 52
         },
         {
@@ -2003,7 +2042,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 92,
+          "line": 95,
           "column": 21
         }
       ]
@@ -2138,7 +2177,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 109,
+          "line": 112,
           "column": 13
         }
       ]
@@ -2288,7 +2327,7 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 188,
+          "line": 206,
           "column": 68
         }
       ]
@@ -2862,6 +2901,18 @@
         }
       ]
     },
+    "ab942a2caccc9837": {
+      "source": "确认退出",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/views/Home.vue",
+          "line": 128,
+          "column": 12
+        }
+      ]
+    },
     "ac217e4d1ca410f1": {
       "source": "发现新版本",
       "kind": "text",
@@ -2893,7 +2944,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 184,
+          "line": 201,
           "column": 47
         }
       ]
@@ -3333,7 +3384,7 @@
       "refs": [
         {
           "file": "src/views/Home.vue",
-          "line": 187,
+          "line": 204,
           "column": 63
         }
       ]
@@ -3820,6 +3871,18 @@
         }
       ]
     },
+    "e25b5c7d42d5149f": {
+      "source": "确定要退出程序吗？",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/views/Home.vue",
+          "line": 129,
+          "column": 14
+        }
+      ]
+    },
     "e406825e0a72d2c2": {
       "source": "本地配置",
       "kind": "text",
@@ -3832,7 +3895,7 @@
         },
         {
           "file": "src/views/Home.vue",
-          "line": 183,
+          "line": 200,
           "column": 56
         }
       ]
@@ -4048,6 +4111,18 @@
           "file": "src/views/ModelConfig.vue",
           "line": 427,
           "column": 15
+        }
+      ]
+    },
+    "f1c33c1df39b9695": {
+      "source": "退出程序",
+      "kind": "text",
+      "placeholders": 0,
+      "refs": [
+        {
+          "file": "src/views/Home.vue",
+          "line": 214,
+          "column": 56
         }
       ]
     },

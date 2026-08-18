@@ -136,6 +136,10 @@ export function openModelConfig() {
   return withApiLogging("OpenModelConfigWindow", undefined, () => OpenModelConfigWindow());
 }
 
+export function quitApp() {
+  return withApiLogging("QuitApp", undefined, () => Call.ByName("cursor/internal/bridge.WindowService.QuitApp"));
+}
+
 export function testModelAdapter(adapter) {
   return Call.ByName(`${PROXY_SERVICE_NAME}.TestModelAdapter`, adapter).then(
     (result) => {

@@ -136,6 +136,19 @@ func (s *WindowService) OpenModelConfigWindow() {
 	s.modelConfigWindow = win
 }
 
+// QuitApp 退出整个应用程序。
+func (s *WindowService) QuitApp() {
+	if s == nil {
+		return
+	}
+	s.mu.RLock()
+	app := s.app
+	s.mu.RUnlock()
+	if app != nil {
+		app.Quit()
+	}
+}
+
 // OpenHistoryWindow 用于处理与 OpenHistoryWindow 相关的逻辑。
 func (s *WindowService) OpenHistoryWindow() {
 	_ = os.MkdirAll(client.ResolveLogsRootPath(), 0o755)

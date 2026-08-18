@@ -5,7 +5,8 @@ import HomeMetricsCard from "@/components/HomeMetricsCard.vue";
 import CursorAccountCard from "@/components/CursorAccountCard.vue";
 import EditHistoryCard from "@/components/EditHistoryCard.vue";
 import { useMessage } from "@/composables/useMessage";
-import { getAdRuntime } from "@/services/clientApi";
+import { showModal } from "@/composables/useModal";
+import { getAdRuntime, quitApp } from "@/services/clientApi";
 import {
   appState,
   appViewState,
@@ -18,10 +19,12 @@ import {
 } from "@/state/appState";
 import { Events } from "@wailsio/runtime";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const AD_UPDATED_EVENT = "ad:updated";
 const OPEN_AD_EVENT = "cursor:open-ad";
 const message = useMessage();
+const router = useRouter();
 
 const adRuntime = ref(null);
 let unsubscribeAdUpdated = null;
@@ -120,6 +123,20 @@ async function handleOpenConfig() {
   }
 }
 
+async function handleQuitApp() {
+  const confirmed = await showModal({
+    title: "确认退出",
+    content: "确定要退出程序吗？",
+    confirmText: "退出",
+    cancelText: "取消",
+    showCancel: true,
+  });
+  if (!confirmed) {
+    return;
+  }
+  await quitApp();
+}
+
 async function handleOpenModelConfig() {
   try {
     await openModelConfigWindow();
@@ -185,8 +202,19 @@ onBeforeUnmount(() => {
         </div>
         <div class="center-row gap-2">
           <Button variant="default" @click="handleOpenConfig">设置文件夹</Button>
+          <Button variant="default" @click="router.push('/config')">系统设置</Button>
           <Button variant="primary" @click="handleOpenModelConfig">模型配置</Button>
         </div>
+      </div>
+    </Card>
+
+    <Card>
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-base font-medium text-white">退出程序</h2>
+          <div class="text-sm text-[#a3a3a3]">完全退出 CursorUltra，不再后台运行</div>
+        </div>
+        <Button variant="default" @click="handleQuitApp">退出</Button>
       </div>
     </Card>
 
