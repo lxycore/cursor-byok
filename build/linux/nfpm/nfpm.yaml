@@ -3,26 +3,26 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "Cursor助手"
+name: "CursorUltra"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.0.48"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "Cursor助手"
-vendor: "Cursor助手"
+description: "CursorUltra"
+vendor: "CursorUltra"
 homepage: "https://wails.io"
 license: "MIT"
 release: "1"
 
 contents:
-  - src: "./bin/Cursor助手"
-    dst: "/usr/local/bin/Cursor助手"
+  - src: "./bin/CursorUltra"
+    dst: "/usr/local/bin/CursorUltra"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/Cursor助手.png"
-  - src: "./build/linux/Cursor助手.desktop"
-    dst: "/usr/share/applications/Cursor助手.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/CursorUltra.png"
+  - src: "./build/linux/CursorUltra.desktop"
+    dst: "/usr/share/applications/CursorUltra.desktop"
 
 # Default dependencies for the GTK4 + WebKitGTK 6.0 stack (Ubuntu 24.04+ / Debian 13+)
 depends:

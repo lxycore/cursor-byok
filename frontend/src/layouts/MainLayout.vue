@@ -16,7 +16,7 @@ import Logo from "@/assets/logo.png";
 const route = useRoute();
 const message = useMessage();
 const showIcon = computed(() => route.meta.showIcon !== false);
-const title = computed(() => route.meta.title ?? "Cursor助手｜永久免费｜自定义API");
+const title = computed(() => route.meta.title ?? "CursorUltra｜永久免费｜自定义API");
 const directlyClose = computed(() => route.meta.directlyClose === true);
 const showFooter = computed(() => route.path === "/");
 const AUTHOR_REPOSITORY_URL = "https://github.com/leookun/cursor-byok";
