@@ -322,10 +322,16 @@ func handleMockAuthStripeProfile(reqCtx *RequestContext, route *Route) error {
 
 func handleMockAuthPoll(reqCtx *RequestContext, route *Route) error {
 	_ = route
+	// authId 与 GetMe / 本地状态库保持一致（InjectAuthToken 的 sub），
+	// 避免不同账号接口返回不同 authId 导致客户端误判身份漂移而反复刷新账号显示。
+	authID := authIDFromJWT(legacyruntime.InjectAuthToken)
+	if authID == "" {
+		authID = "local_auth"
+	}
 	responseBody, err := marshalJSONBody(map[string]any{
 		"accessToken":  legacyruntime.InjectAuthToken,
 		"refreshToken": legacyruntime.InjectAuthToken,
-		"authId":       "local_auth",
+		"authId":       authID,
 	})
 	if err != nil {
 		return err

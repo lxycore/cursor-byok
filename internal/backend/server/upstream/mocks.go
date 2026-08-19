@@ -30,7 +30,6 @@ const (
 	localUltraPlanIncludedCents    = 20000
 	localUltraDashboardUserID      = 1
 	localUltraBillingCycleDuration = 30 * 24 * time.Hour
-
 	bootstrapStatsigGlassModeAvailableGate           = "glass_mode_available"
 	bootstrapStatsigGlassOpenAgentInWindowGate       = "glass.enable_open_agent_in_window"
 	bootstrapStatsigOpenAgentsTitlebarGate           = "glass_open_agents_titlebar_button"
@@ -85,6 +84,13 @@ const (
 	bootstrapStatsigUpdatePromptConfig               = "update_prompt_config"
 	bootstrapStatsigLocalDefaultRule                 = "local_default"
 )
+
+// localUltraFixedAccountAnchor 是本地 mock 账号/套餐资料的固定基准时间。
+// 账号相关接口必须返回完全幂等（静态）的数据：若 created/billing 时间戳使用
+// time.Now() 生成，Cursor 客户端周期性刷新账号/套餐接口时会把"时间戳变化"
+// 误判为"账号状态更新"，触发 Agent/Glass 窗口反复重渲染（账号区域频繁闪烁）。
+// IDE 窗口只读取一次本地状态库缓存所以稳定，Agent 窗口高频轮询所以被放大。
+var localUltraFixedAccountAnchor = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 
 type statsigSecondaryExposure struct {
 	Gate           string `json:"gate,omitempty"`
@@ -548,8 +554,8 @@ func buildFirstWindowStatsigDecisionPayload(*RequestContext) (map[string]any, er
 }
 
 func buildDashboardCurrentPeriodUsagePayload(*RequestContext) (map[string]any, error) {
-	billingCycleStart := time.Now().Add(-localUltraBillingCycleDuration).UnixMilli()
-	billingCycleEnd := time.Now().Add(10 * 365 * 24 * time.Hour).UnixMilli()
+	billingCycleStart := localUltraFixedAccountAnchor.Add(-localUltraBillingCycleDuration).UnixMilli()
+	billingCycleEnd := localUltraFixedAccountAnchor.Add(10 * 365 * 24 * time.Hour).UnixMilli()
 	return map[string]any{
 		"autoModelSelectedDisplayMessage":  "Ultra plan active",
 		"billingCycleEnd":                  billingCycleEnd,
@@ -589,25 +595,27 @@ func buildDashboardManagedSkillsPayload(*RequestContext) (map[string]any, error)
 	}, nil
 }
 
-func buildDashboardGetMePayload(reqCtx *RequestContext) (map[string]any, error) {
-	authID := ""
-	if reqCtx != nil {
-		authID = authIDFromBearer(reqCtx.Headers.Get("authorization"))
-	}
-	if authID == "" {
-		authID = authIDFromJWT(legacyruntime.InjectAuthToken)
-	}
+func buildDashboardGetMePayload(*RequestContext) (map[string]any, error) {
+	// authId 固定为本地注入身份（InjectAuthToken 的 JWT sub），不从请求头解析：
+	// 客户端可能携带不同的 Authorization 访问 GetMe（本地注入 token / 刷新后的
+	// token / 历史缓存 token），若 authId 随请求头变化，客户端会误判账号身份漂移
+	// 而反复刷新，导致 Agent 窗口账号显示闪烁。
+	authID := authIDFromJWT(legacyruntime.InjectAuthToken)
 	if authID == "" {
 		authID = localUltraPaymentID
 	}
 
+	// 故意不返回 firstName/lastName：Cursor 客户端对 GetMe 的账号显示
+	// 优先使用姓名（firstName+lastName），缺省时才回退到 email。
+	// 若返回 "Cursor Local" 会让 Agent/Glass 窗口显示本地 mock 姓名，
+	// 与 IDE 窗口读取本地状态库的 cursorAuth/cachedEmail=cursor@ai.com
+	// 不一致，导致账号显示在两个来源之间反复闪烁。
+	// 这里统一只暴露 email，使所有模式的账号显示一致为 cursor@ai.com。
 	return map[string]any{
 		"authId":            authID,
 		"userId":            localUltraDashboardUserID,
 		"email":             legacyruntime.InjectAccountEmail,
-		"firstName":         "Cursor",
-		"lastName":          "Local",
-		"createdAt":         time.Now().UTC().Format(time.RFC3339),
+		"createdAt":         localUltraFixedAccountAnchor.Format(time.RFC3339),
 		"isEnterpriseUser":  false,
 		"teamName":          "",
 		"emailDomainType":   "personal",
@@ -633,7 +641,7 @@ func buildDashboardPlanInfoPayload(*RequestContext) (map[string]any, error) {
 			"planName":            "Ultra Plan",
 			"includedAmountCents": localUltraPlanIncludedCents,
 			"price":               "$200/mo",
-			"billingCycleEnd":     time.Now().Add(10 * 365 * 24 * time.Hour).UnixMilli(),
+			"billingCycleEnd":     localUltraFixedAccountAnchor.Add(10 * 365 * 24 * time.Hour).UnixMilli(),
 		},
 	}, nil
 }
@@ -895,13 +903,12 @@ func firstModelAdapterRef(adapters []legacyruntime.ModelAdapterConfig) string {
 	return refs[0]
 }
 
-func resolveBootstrapStatsigAuthID(reqCtx *RequestContext) string {
-	if reqCtx != nil {
-		if authID := authIDFromBearer(reqCtx.Headers.Get("authorization")); authID != "" {
-			return authID
-		}
-	}
-	if authID := authIDFromJWT(legacyruntime.InjectAuthToken); authID != "" {
+func resolveBootstrapStatsigAuthID(*RequestContext) string {
+	// 与 GetMe / auth/poll / 本地状态库保持一致，固定使用 InjectAuthToken 的 sub。
+	// 若从请求头解析，客户端不同请求携带的 token 会令 statsig userID 漂移，
+	// 间接放大账号 UI 的反复刷新。
+	authID := authIDFromJWT(legacyruntime.InjectAuthToken)
+	if authID != "" {
 		return authID
 	}
 	return localUltraPaymentID
