@@ -49,6 +49,16 @@ mod tests {
     use super::*;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+    fn test_client() -> reqwest::Client {
+        // These tests exercise a local fixture and transport errors; do not let
+        // a developer machine's system proxy turn a refused localhost connection
+        // into an unrelated HTTP 502 response.
+        reqwest::Client::builder()
+            .no_proxy()
+            .build()
+            .expect("test client")
+    }
+
     async fn server(response: &'static [u8]) -> String {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
         let address = listener.local_addr().unwrap();
@@ -65,7 +75,7 @@ mod tests {
     async fn non_success_status_is_one_failed_attempt() {
         let url =
             server(b"HTTP/1.1 503 Service Unavailable\r\nContent-Length: 4\r\n\r\ndown").await;
-        let client = reqwest::Client::new();
+        let client = test_client();
         let error = send_once("test", || client.get(&url), &CancellationToken::new(), None)
             .await
             .unwrap_err();
@@ -78,7 +88,7 @@ mod tests {
     async fn response_body_transport_failure_is_one_failed_attempt() {
         let url =
             server(b"HTTP/1.1 500 Internal Server Error\r\nContent-Length: 100\r\n\r\nshort").await;
-        let client = reqwest::Client::new();
+        let client = test_client();
         let error = send_once("test", || client.get(&url), &CancellationToken::new(), None)
             .await
             .unwrap_err();
@@ -91,10 +101,10 @@ mod tests {
         let address = listener.local_addr().unwrap();
         drop(listener);
         let url = format!("http://{address}");
-        let client = reqwest::Client::new();
+        let client = test_client();
         let error = send_once("test", || client.get(&url), &CancellationToken::new(), None)
             .await
             .unwrap_err();
-        assert!(matches!(error, Error::Http(_)));
+        assert!(matches!(&error, Error::Http(_)), "{error}");
     }
 }
